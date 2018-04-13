@@ -1,50 +1,26 @@
 package gomcts
 
+type GameResult int8
+
 type NodeStatistics struct {
-	Q int8
-	N int8
-}
-
-type GameFinisher interface {
-	IsGameOver() bool
-}
-
-type GameMover interface {
-	Move() GameState
-}
-
-type GameResultCalculator interface {
-	GameResult() int8
+	Q float64
+	N int64
 }
 
 type GameState interface {
-	GameMover
-	GameFinisher
-	GameResultCalculator
-}
-
-type StatisticsHolder interface {
-	GetStatistics() NodeStatistics
-}
-
-type Expander interface {
-	Expand()
-}
-
-type PlayoutPerformer interface {
-	Playout()
-}
-
-type Backpropagator interface {
-	Backpropagate()
+	Move() GameState
+	IsGameOver() bool
+	EvaluateGame() GameResult
 }
 
 type MCTSNode interface {
-	StatisticsHolder
-	Expander
-	PlayoutPerformer
-	Backpropagator
+	GetStatistics() NodeStatistics
+	Expand() []MCTSNode
+	Rollout(RolloutPolicy) GameResult
+	Backpropagate()
 }
+
+type RolloutPolicy func(GameState) GameResult
 
 type MonteCarloTreeSearchGameNode struct {
 	parent   *MonteCarloTreeSearchGameNode
