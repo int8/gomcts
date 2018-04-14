@@ -12,8 +12,12 @@ func (a TicTacToeBoardGameAction) Apply(s TicTacToeGameState) TicTacToeGameState
 		panic("*hands slapped*,  not your turn")
 	}
 
-	if !s.legalActions[a] {
-		panic("*hands slapped*,  action illegal")
+	if s.emptySquares == 0 {
+		panic("*hands slapped*,  no empty squares on board")
+	}
+
+	if s.board[a.xCoord][a.yCoord] != 0 {
+		panic("*hands slapped*,  action illegal - square already occupied")
 	}
 
 	s.board[a.xCoord][a.yCoord] = a.value
@@ -23,40 +27,77 @@ func (a TicTacToeBoardGameAction) Apply(s TicTacToeGameState) TicTacToeGameState
 type TicTacToeGameState struct {
 	nextToMove   int8
 	board        [][]int8
-	legalActions map[TicTacToeBoardGameAction]bool
+	emptySquares uint16
 }
 
 func CreateTicTacToeInitialGameState(n uint8) TicTacToeGameState {
 
-	legalActions := make(map[TicTacToeBoardGameAction]bool)
 	board := make([][]int8, n)
 	for i := range board {
 		board[i] = make([]int8, n)
-		for j := range board[i] {
-			legalActions[TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: 0}] = true
-			legalActions[TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: 1}] = true
-			legalActions[TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: -1}] = true
-		}
 	}
-	state := TicTacToeGameState{nextToMove: 1, board: board, legalActions: legalActions}
+	state := TicTacToeGameState{nextToMove: 1, board: board, emptySquares: uint16(n) * uint16(n)}
 	return state
 }
 
 func (s TicTacToeGameState) Move(a TicTacToeBoardGameAction) TicTacToeGameState {
 	nextState := a.Apply(s)
 	nextState.nextToMove *= -1
-	delete(nextState.legalActions, a)
+	nextState.emptySquares--
 	return nextState
 }
 
 func (s TicTacToeGameState) EvaluateGame() (GameResult, bool) {
-	return GameResult(0), true
+	boardSize := len(s.board)
+	rowSums := make([]int16, boardSize)
+	colSums := make([]int16, boardSize)
+
+	diag1Sum := int16(0)
+	diag2Sum := int16(0)
+
+	for i := range s.board {
+		for j := range s.board[i] {
+			rowSums[i] += int16(s.board[i][j])
+			colSums[j] += int16(s.board[i][j])
+		}
+		diag1Sum += int16(s.board[i][i])
+		diag2Sum += int16(s.board[boardSize - 1 - i][i])
+ 	}
+
+	if diag1Sum == int16(boardSize) || diag2Sum == int16(boardSize)  {
+		return GameResult(1), true
+	}
+
+	if diag1Sum == -int16(boardSize) || diag2Sum == -int16(boardSize)  {
+		return GameResult(-1), true
+	}
+
+ 	for i := range s.board {
+		if rowSums[i] == int16(boardSize) || colSums[i] == int16(boardSize)  {
+			return GameResult(1), true
+		}
+
+		if rowSums[i] == -int16(boardSize) || colSums[i] == -int16(boardSize)  {
+			return GameResult(-1), true
+		}
+	}
+
+	if s.emptySquares == 0 {
+		return GameResult(0), true
+	}
+
+	return GameResult(0), false
 }
 
 func (s TicTacToeGameState) GetLegalActions() []TicTacToeBoardGameAction {
-	actions := make([]TicTacToeBoardGameAction, 0, len(s.legalActions))
-	for k := range s.legalActions {
-		actions = append(actions, k)
+	actions := make([]TicTacToeBoardGameAction, 0, s.emptySquares*2)
+	for i := range s.board {
+		for j := range s.board[i] {
+			if s.board[i][j] == 0 {
+				actions = append(actions, TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: 1})
+				actions = append(actions, TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: -1})
+			}
+		}
 	}
 	return actions
 }
