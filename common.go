@@ -9,6 +9,9 @@ type NodeStatistics struct {
 	N int64
 }
 
+// RolloutPolicy - function signature determining the next game state during Monte Carlo Tree Search rollout
+type RolloutPolicy func(GameState) GameState
+
 // Action - action to be performed
 type Action interface {
 	Apply(GameState) GameState
@@ -29,12 +32,3 @@ type MCTSNode interface {
 	Backpropagate()
 }
 
-// RolloutPolicy - function signature determining the next game state during Monte Carlo Tree Search rollout
-type RolloutPolicy func(GameState) GameState
-
-// MonteCarloTreeSearchGameNode - MCTS tree node struct
-type MonteCarloTreeSearchGameNode struct {
-	parent   *MonteCarloTreeSearchGameNode
-	value    GameState
-	children []MonteCarloTreeSearchGameNode
-}

@@ -1,5 +1,11 @@
 package gomcts
 
+type TicTacToeGameState struct {
+	nextToMove   int8
+	board        [][]int8
+	emptySquares uint16
+}
+
 // TicTacToeBoardGameAction - action on a board game
 type TicTacToeBoardGameAction struct {
 	xCoord uint8
@@ -8,6 +14,7 @@ type TicTacToeBoardGameAction struct {
 }
 
 func (a TicTacToeBoardGameAction) Apply(s TicTacToeGameState) TicTacToeGameState {
+	s.board = copyBoard(s.board)
 	if s.nextToMove != a.value {
 		panic("*hands slapped*,  not your turn")
 	}
@@ -24,18 +31,8 @@ func (a TicTacToeBoardGameAction) Apply(s TicTacToeGameState) TicTacToeGameState
 	return s
 }
 
-type TicTacToeGameState struct {
-	nextToMove   int8
-	board        [][]int8
-	emptySquares uint16
-}
-
 func CreateTicTacToeInitialGameState(n uint8) TicTacToeGameState {
-
-	board := make([][]int8, n)
-	for i := range board {
-		board[i] = make([]int8, n)
-	}
+	board := emptyBoard2D(n)
 	state := TicTacToeGameState{nextToMove: 1, board: board, emptySquares: uint16(n) * uint16(n)}
 	return state
 }
@@ -51,7 +48,6 @@ func (s TicTacToeGameState) EvaluateGame() (GameResult, bool) {
 	boardSize := len(s.board)
 	rowSums := make([]int16, boardSize)
 	colSums := make([]int16, boardSize)
-
 	diag1Sum := int16(0)
 	diag2Sum := int16(0)
 
@@ -76,7 +72,6 @@ func (s TicTacToeGameState) EvaluateGame() (GameResult, bool) {
 		if rowSums[i] == int16(boardSize) || colSums[i] == int16(boardSize)  {
 			return GameResult(1), true
 		}
-
 		if rowSums[i] == -int16(boardSize) || colSums[i] == -int16(boardSize)  {
 			return GameResult(-1), true
 		}
