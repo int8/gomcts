@@ -29,6 +29,6 @@ type MCTSNode interface {
 	GetStatistics() NodeStatistics
 	BestChild() []MCTSNode
 	Rollout(RolloutPolicy) GameResult
-	Backpropagate()
+	Backpropagate(GameResult)
 }
 
