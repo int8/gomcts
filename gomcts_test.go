@@ -60,13 +60,13 @@ func TestEmptyTicTacToeGameStateEvaluation(t *testing.T) {
 
 func TestNumberOfLegalActionsOfTicTacToeGameState(t *testing.T) {
 	state := createTicTacToeInitialGameState(3)
-	states := state.GetLegalGameStates()
+	states := state.GetLegalNextGameStates()
 	if len(states) != 9 {
 		t.Errorf("There should be 9 actions to perform but is %v", len(states))
 	}
 
 	newState := states[0]
-	states = newState.GetLegalGameStates()
+	states = newState.GetLegalNextGameStates()
 	if len(states) != 8 {
 		t.Errorf("There should be 8 legal actions to perform after first move but is %v", len(states))
 	}
@@ -81,7 +81,7 @@ func TestLegalGameStateZeroIfGameEnded(t *testing.T) {
 		{ 0,-1, 1},
 	}
 
-	states := state.GetLegalGameStates()
+	states := state.GetLegalNextGameStates()
 	if len(states) > 0 {
 		t.Errorf("Game is ended but state has legal game states to go to")
 	}
@@ -332,6 +332,49 @@ func TestRolloutTerminates(t *testing.T) {
 	node.Rollout(DefaultRolloutPolicy)
 }
 
+
+func TestUCTBestChildNewNode(t *testing.T) {
+	state := createTicTacToeInitialGameState(3)
+	node := NewMCTSNode(nil, state)
+	if len(node.untriedGameStates) != 9 {
+		t.Errorf("There should be 9 untried game states at the beginning of 3x3 tic tac toe game")
+	}
+	node.UCTBestChild(1.4)
+
+	if len(node.untriedGameStates) != 8 {
+		t.Errorf("There should be 8 untried game states after first UCTBestChild for 3x3 tic tac toe game but is %v", len(node.untriedGameStates))
+	}
+}
+
+
+func TestUCTBestChildNewNode9Times(t *testing.T) {
+	state := createTicTacToeInitialGameState(3)
+	node := NewMCTSNode(nil, state)
+	if len(node.untriedGameStates) != 9 {
+		t.Errorf("There should be 9 untried game states at the beginning of 3x3 tic tac toe game")
+	}
+	node.UCTBestChild(1.4)
+	node.UCTBestChild(1.4)
+	node.UCTBestChild(1.4)
+	node.UCTBestChild(1.4)
+	node.UCTBestChild(1.4)
+	node.UCTBestChild(1.4)
+	node.UCTBestChild(1.4)
+	node.UCTBestChild(1.4)
+	node.UCTBestChild(1.4)
+
+	if len(node.untriedGameStates) != 0 {
+		t.Errorf("There should be 0 untried game states after first UCTBestChild for 3x3 tic tac toe game but is %v", len(node.untriedGameStates))
+	}
+
+	if !node.IsFullyExpanded() {
+		t.Errorf("Node should be fully expanded now but is not")
+	}
+
+	node.UCTBestChild(1.4)
+}
+
+
 func TestNodeIsTerminal(t *testing.T) {
 	state := createTicTacToeInitialGameState(3)
 	state.emptySquares = 3
@@ -346,6 +389,8 @@ func TestNodeIsTerminal(t *testing.T) {
 		t.Errorf("Node should be terminal but is not")
 	}
 }
+
+
 
 
 

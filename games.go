@@ -102,7 +102,7 @@ func (s TicTacToeGameState) EvaluateGame() (result GameResult, ended bool) {
 	return GameResult(0), false
 }
 
-func (s TicTacToeGameState) GetLegalGameStates() []GameState {
+func (s TicTacToeGameState) GetLegalNextGameStates() []GameState {
 	if !s.IsGameEnded() {
 		states := make([]GameState, 0, s.emptySquares)
 		for i := range s.board {
