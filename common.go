@@ -10,6 +10,7 @@ type RolloutPolicy func(GameState) GameState
 type GameState interface {
 	EvaluateGame() (GameResult, bool)
 	GetLegalGameStates() []GameState
+	IsGameEnded() bool
 }
 
 // MCTSNode - Monte Carlo Tree Search node interface
@@ -17,5 +18,8 @@ type MCTSNode interface {
 	UCTBestChild() MCTSNode
 	Rollout(RolloutPolicy) GameResult
 	Backpropagate(GameResult)
+	IsFullyExpanded() bool
+	IsTerminal() bool
+	IsLeaf() bool
 }
 

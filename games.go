@@ -2,11 +2,6 @@ package gomcts
 
 import "fmt"
 
-type TicTacToeGameState struct {
-	nextToMove   int8
-	board        [][]int8
-	emptySquares uint16
-}
 
 // TicTacToeBoardGameAction - action on a board game
 type TicTacToeBoardGameAction struct {
@@ -36,14 +31,32 @@ func (a TicTacToeBoardGameAction) ApplyTo(s TicTacToeGameState) TicTacToeGameSta
 	return s
 }
 
-func CreateTicTacToeInitialGameState(boardSize uint8) TicTacToeGameState {
+
+type TicTacToeGameState struct {
+	nextToMove   int8
+	board        [][]int8
+	emptySquares uint16
+	ended        bool
+	result       GameResult
+}
+
+func createTicTacToeInitialGameState(boardSize uint8) TicTacToeGameState {
 	board := initialize2DInt8Slice(boardSize)
 	state := TicTacToeGameState{nextToMove: 1, board: board, emptySquares: uint16(boardSize) * uint16(boardSize)}
 	return state
 }
 
 
+func (s TicTacToeGameState) IsGameEnded() bool {
+	_, ended := s.EvaluateGame()
+	return ended
+}
+
 func (s TicTacToeGameState) EvaluateGame() (GameResult, bool) {
+	if s.ended {
+		return s.result, s.ended
+	}
+
 	boardSize := len(s.board)
 	rowSums := make([]int16, boardSize)
 	colSums := make([]int16, boardSize)
@@ -60,37 +73,46 @@ func (s TicTacToeGameState) EvaluateGame() (GameResult, bool) {
  	}
 
 	if diag1Sum == int16(boardSize) || diag2Sum == int16(boardSize)  {
-		return GameResult(1), true
+		s.result, s.ended = GameResult(1), true
+		return s.result, s.ended
 	}
 
 	if diag1Sum == -int16(boardSize) || diag2Sum == -int16(boardSize)  {
-		return GameResult(-1), true
+		s.result, s.ended = GameResult(-1), true
+		return s.result, s.ended
 	}
 
  	for i := range s.board {
 		if rowSums[i] == int16(boardSize) || colSums[i] == int16(boardSize)  {
-			return GameResult(1), true
+			s.result, s.ended = GameResult(1), true
+			return s.result, s.ended
 		}
 		if rowSums[i] == -int16(boardSize) || colSums[i] == -int16(boardSize)  {
-			return GameResult(-1), true
+			s.result, s.ended = GameResult(-1), true
+			return s.result, s.ended
 		}
 	}
 
 	if s.emptySquares == 0 {
-		return GameResult(0), true
+		s.result, s.ended = GameResult(0), true
+		return s.result, s.ended
 	}
 
-	return GameResult(0), false
+	s.result, s.ended = GameResult(0), false
+	return s.result, s.ended
 }
 
 func (s TicTacToeGameState) GetLegalGameStates() []GameState {
-	states := make([]GameState, 0, s.emptySquares)
-	for i := range s.board {
-		for j := range s.board[i] {
-			if s.board[i][j] == 0 {
-				states = append(states, TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: s.nextToMove}.ApplyTo(s))
+	if !s.IsGameEnded() {
+		states := make([]GameState, 0, s.emptySquares)
+		for i := range s.board {
+			for j := range s.board[i] {
+				if s.board[i][j] == 0 {
+					states = append(states, TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: s.nextToMove}.ApplyTo(s))
+				}
 			}
 		}
+		return states
 	}
-	return states
+	return nil
 }
