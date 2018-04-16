@@ -52,7 +52,13 @@ func (s TicTacToeGameState) IsGameEnded() bool {
 	return ended
 }
 
-func (s TicTacToeGameState) EvaluateGame() (GameResult, bool) {
+func (s TicTacToeGameState) EvaluateGame() (result GameResult, ended bool) {
+
+	defer func() {
+		s.result = result
+		s.ended = ended
+	}()
+
 	if s.ended {
 		return s.result, s.ended
 	}
@@ -73,33 +79,27 @@ func (s TicTacToeGameState) EvaluateGame() (GameResult, bool) {
  	}
 
 	if diag1Sum == int16(boardSize) || diag2Sum == int16(boardSize)  {
-		s.result, s.ended = GameResult(1), true
-		return s.result, s.ended
+		return GameResult(1), true
 	}
 
 	if diag1Sum == -int16(boardSize) || diag2Sum == -int16(boardSize)  {
-		s.result, s.ended = GameResult(-1), true
-		return s.result, s.ended
+		return GameResult(-1), true
 	}
 
  	for i := range s.board {
 		if rowSums[i] == int16(boardSize) || colSums[i] == int16(boardSize)  {
-			s.result, s.ended = GameResult(1), true
-			return s.result, s.ended
+			return GameResult(1), true
 		}
 		if rowSums[i] == -int16(boardSize) || colSums[i] == -int16(boardSize)  {
-			s.result, s.ended = GameResult(-1), true
-			return s.result, s.ended
+			return GameResult(-1), true
 		}
 	}
 
 	if s.emptySquares == 0 {
-		s.result, s.ended = GameResult(0), true
-		return s.result, s.ended
+		return GameResult(0), true
 	}
 
-	s.result, s.ended = GameResult(0), false
-	return s.result, s.ended
+	return GameResult(0), false
 }
 
 func (s TicTacToeGameState) GetLegalGameStates() []GameState {

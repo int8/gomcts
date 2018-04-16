@@ -130,6 +130,11 @@ func TestGameEvaluationShouldBeNotEnded(t *testing.T) {
 	if ended {
 		t.Errorf("Game should be not ended but is")
 	}
+
+	if state.ended {
+		t.Errorf("Game should be not ended but is")
+	}
+
 }
 
 func TestGameEvaluationShouldBeDraw(t *testing.T) {
@@ -149,6 +154,11 @@ func TestGameEvaluationShouldBeDraw(t *testing.T) {
 	if !ended {
 		t.Errorf("Game should be ended but is not")
 	}
+
+	if state.ended {
+		t.Errorf("Game should be ended but is not")
+	}
+
 }
 
 
