@@ -3,31 +3,18 @@ package gomcts
 // GameResult - number representing a game result
 type GameResult int8
 
-// NodeStatistics - statistics gathered while MCTS simulations
-type NodeStatistics struct {
-	Q float64
-	N int64
-}
-
 // RolloutPolicy - function signature determining the next game state during Monte Carlo Tree Search rollout
 type RolloutPolicy func(GameState) GameState
 
-// Action - action to be performed
-type Action interface {
-	Apply(GameState) GameState
-}
-
 // GameState - state of the game interface
 type GameState interface {
-	Move(Action) GameState
 	EvaluateGame() (GameResult, bool)
-	GetLegalActions() []Action
+	GetLegalGameStates() []GameState
 }
 
 // MCTSNode - Monte Carlo Tree Search node interface
 type MCTSNode interface {
-	GetStatistics() NodeStatistics
-	BestChild() []MCTSNode
+	UCTBestChild() MCTSNode
 	Rollout(RolloutPolicy) GameResult
 	Backpropagate(GameResult)
 }

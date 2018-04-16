@@ -1,5 +1,7 @@
 package gomcts
 
+import "fmt"
+
 type TicTacToeGameState struct {
 	nextToMove   int8
 	board        [][]int8
@@ -13,8 +15,8 @@ type TicTacToeBoardGameAction struct {
 	value  int8
 }
 
-func (a TicTacToeBoardGameAction) Apply(s TicTacToeGameState) TicTacToeGameState {
-	s.board = copyBoard(s.board)
+func (a TicTacToeBoardGameAction) ApplyTo(s TicTacToeGameState) TicTacToeGameState {
+	s.board = copy2DInt8Slice(s.board)
 	if s.nextToMove != a.value {
 		panic("*hands slapped*,  not your turn")
 	}
@@ -24,25 +26,22 @@ func (a TicTacToeBoardGameAction) Apply(s TicTacToeGameState) TicTacToeGameState
 	}
 
 	if s.board[a.xCoord][a.yCoord] != 0 {
+		fmt.Println(a, s)
 		panic("*hands slapped*,  action illegal - square already occupied")
 	}
 
 	s.board[a.xCoord][a.yCoord] = a.value
+	s.nextToMove *= -1
+	s.emptySquares--
 	return s
 }
 
-func CreateTicTacToeInitialGameState(n uint8) TicTacToeGameState {
-	board := emptyBoard2D(n)
-	state := TicTacToeGameState{nextToMove: 1, board: board, emptySquares: uint16(n) * uint16(n)}
+func CreateTicTacToeInitialGameState(boardSize uint8) TicTacToeGameState {
+	board := initialize2DInt8Slice(boardSize)
+	state := TicTacToeGameState{nextToMove: 1, board: board, emptySquares: uint16(boardSize) * uint16(boardSize)}
 	return state
 }
 
-func (s TicTacToeGameState) Move(a TicTacToeBoardGameAction) TicTacToeGameState {
-	nextState := a.Apply(s)
-	nextState.nextToMove *= -1
-	nextState.emptySquares--
-	return nextState
-}
 
 func (s TicTacToeGameState) EvaluateGame() (GameResult, bool) {
 	boardSize := len(s.board)
@@ -84,15 +83,14 @@ func (s TicTacToeGameState) EvaluateGame() (GameResult, bool) {
 	return GameResult(0), false
 }
 
-func (s TicTacToeGameState) GetLegalActions() []TicTacToeBoardGameAction {
-	actions := make([]TicTacToeBoardGameAction, 0, s.emptySquares*2)
+func (s TicTacToeGameState) GetLegalGameStates() []GameState {
+	states := make([]GameState, 0, s.emptySquares)
 	for i := range s.board {
 		for j := range s.board[i] {
 			if s.board[i][j] == 0 {
-				actions = append(actions, TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: 1})
-				actions = append(actions, TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: -1})
+				states = append(states, TicTacToeBoardGameAction{xCoord: uint8(i), yCoord: uint8(j), value: s.nextToMove}.ApplyTo(s))
 			}
 		}
 	}
-	return actions
+	return states
 }
