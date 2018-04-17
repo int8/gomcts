@@ -1,8 +1,8 @@
 package gomcts
 
 import (
-	"math/rand"
 	"math"
+	"math/rand"
 )
 
 func DefaultRolloutPolicy(state GameState) GameState {
@@ -13,12 +13,12 @@ func DefaultRolloutPolicy(state GameState) GameState {
 
 // MonteCarloTreeSearchGameNode - MCTS tree node struct
 type MonteCarloTreeSearchGameNode struct {
-	parent   *MonteCarloTreeSearchGameNode
-	value    GameState
-	children []MonteCarloTreeSearchGameNode
+	parent            *MonteCarloTreeSearchGameNode
+	value             GameState
+	children          []MonteCarloTreeSearchGameNode
 	untriedGameStates []GameState
-	q        float64
-	n        int64
+	q                 float64
+	n                 int64
 }
 
 // NewMCTSNode - function initializing new MonteCarloTreeSearchGameNode
@@ -29,28 +29,31 @@ func NewMCTSNode(parentNode *MonteCarloTreeSearchGameNode, state GameState) Mont
 	return node
 }
 
-func (node *MonteCarloTreeSearchGameNode) UCTBestChild(c float64) MCTSNode {
+func (node *MonteCarloTreeSearchGameNode) GameState() GameState {
+	return node.value
+}
+
+func (node *MonteCarloTreeSearchGameNode) UCTBestChild(c float64) (child MCTSNode, isLeaf bool) {
 	if node.IsTerminal() {
-		return nil
+		return nil, true
 	}
 
 	if node.IsFullyExpanded() {
 		chosenIndex := 0
 		maxValue := 0.0
-		for i, child:= range node.children {
-			if (child.q / float64(child.n)) + c * math.Sqrt(2 * math.Log(float64(node.n)) / float64(child.n)) > maxValue {
+		for i, child := range node.children {
+			if (child.q/float64(child.n))+c*math.Sqrt(2*math.Log(float64(node.n))/float64(child.n)) > maxValue {
 				chosenIndex = i
 			}
 		}
-		return &node.children[chosenIndex]
+		return &node.children[chosenIndex], false
 	}
 	state := node.untriedGameStates[0]
 	node.untriedGameStates = node.untriedGameStates[1:]
 	childNode := NewMCTSNode(node, state)
 	node.addChild(&childNode)
-	return MCTSNode(&childNode)
+	return MCTSNode(&childNode), true
 }
-
 
 func (node *MonteCarloTreeSearchGameNode) Rollout(policy RolloutPolicy) GameResult {
 	currentState := node.value
@@ -64,7 +67,6 @@ func (node *MonteCarloTreeSearchGameNode) Rollout(policy RolloutPolicy) GameResu
 	}
 }
 
-
 func (node *MonteCarloTreeSearchGameNode) Backpropagate(result GameResult) {
 	node.q += float64(result)
 	node.n++
@@ -72,7 +74,6 @@ func (node *MonteCarloTreeSearchGameNode) Backpropagate(result GameResult) {
 		node.getParent().Backpropagate(result)
 	}
 }
-
 
 func (node *MonteCarloTreeSearchGameNode) IsTerminal() bool {
 	_, ended := node.value.EvaluateGame()
@@ -82,8 +83,3 @@ func (node *MonteCarloTreeSearchGameNode) IsTerminal() bool {
 func (node *MonteCarloTreeSearchGameNode) IsFullyExpanded() bool {
 	return len(node.untriedGameStates) == 0 && !node.IsTerminal()
 }
-
-func (node *MonteCarloTreeSearchGameNode) IsLeaf() bool {
-	return node.n == 0
-}
-
