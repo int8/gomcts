@@ -25,9 +25,9 @@ func TestTicTacToeGameStateInitialization(t *testing.T) {
 func TestMoveProducesTicTacToeGameStateCorrectly(t *testing.T) {
 	state := createTicTacToeInitialGameState(3)
 	action := TicTacToeBoardGameAction{xCoord:1, yCoord:1, value:1}
-	nextState := action.ApplyTo(state)
+	nextState := action.ApplyTo(state).(TicTacToeGameState)
 
-	if nextState.emptySquares != 8 {
+	if nextState.emptySquares!= 8 {
 		t.Errorf("state.emptySquares should be 8, but it is %v", state.emptySquares)
 	}
 
@@ -60,15 +60,15 @@ func TestEmptyTicTacToeGameStateEvaluation(t *testing.T) {
 
 func TestNumberOfLegalActionsOfTicTacToeGameState(t *testing.T) {
 	state := createTicTacToeInitialGameState(3)
-	states := state.GetLegalNextGameStates()
-	if len(states) != 9 {
-		t.Errorf("There should be 9 actions to perform but is %v", len(states))
+	actions := state.GetLegalActions()
+	if len(actions) != 9 {
+		t.Errorf("There should be 9 actions to perform but is %v", len(actions))
 	}
 
-	newState := states[0]
-	states = newState.GetLegalNextGameStates()
-	if len(states) != 8 {
-		t.Errorf("There should be 8 legal actions to perform after first move but is %v", len(states))
+	newState := actions[0].ApplyTo(state)
+	actions = newState.GetLegalActions()
+	if len(actions) != 8 {
+		t.Errorf("There should be 8 legal actions to perform after first move but is %v", len(actions))
 	}
 }
 
@@ -81,9 +81,9 @@ func TestLegalGameStateZeroIfGameEnded(t *testing.T) {
 		{ 0,-1, 1},
 	}
 
-	states := state.GetLegalNextGameStates()
-	if len(states) > 0 {
-		t.Errorf("Game is ended but state has legal game states to go to")
+	actions := state.GetLegalActions()
+	if len(actions) > 0 {
+		t.Errorf("Game is ended but state has legal actions to go to")
 	}
 }
 
@@ -336,13 +336,13 @@ func TestRolloutTerminates(t *testing.T) {
 func TestUCTBestChildNewNode(t *testing.T) {
 	state := createTicTacToeInitialGameState(3)
 	node := NewMCTSNode(nil, state)
-	if len(node.untriedGameStates) != 9 {
-		t.Errorf("There should be 9 untried game states at the beginning of 3x3 tic tac toe game")
+	if len(node.untriedActions) != 9 {
+		t.Errorf("There should be 9 untried actions at the beginning of 3x3 tic tac toe game")
 	}
 	node.UCTBestChild(1.4)
 
-	if len(node.untriedGameStates) != 8 {
-		t.Errorf("There should be 8 untried game states after first UCTBestChild for 3x3 tic tac toe game but is %v", len(node.untriedGameStates))
+	if len(node.untriedActions) != 8 {
+		t.Errorf("There should be 8 untried actions after first UCTBestChild for 3x3 tic tac toe game but is %v", len(node.untriedActions))
 	}
 }
 
@@ -350,8 +350,8 @@ func TestUCTBestChildNewNode(t *testing.T) {
 func TestUCTBestChildNewNode9Times(t *testing.T) {
 	state := createTicTacToeInitialGameState(3)
 	node := NewMCTSNode(nil, state)
-	if len(node.untriedGameStates) != 9 {
-		t.Errorf("There should be 9 untried game states at the beginning of 3x3 tic tac toe game")
+	if len(node.untriedActions) != 9 {
+		t.Errorf("There should be 9 untried actions at the beginning of 3x3 tic tac toe game")
 	}
 	node.UCTBestChild(1.4)
 	node.UCTBestChild(1.4)
@@ -363,8 +363,8 @@ func TestUCTBestChildNewNode9Times(t *testing.T) {
 	node.UCTBestChild(1.4)
 	node.UCTBestChild(1.4)
 
-	if len(node.untriedGameStates) != 0 {
-		t.Errorf("There should be 0 untried game states after first UCTBestChild for 3x3 tic tac toe game but is %v", len(node.untriedGameStates))
+	if len(node.untriedActions) != 0 {
+		t.Errorf("There should be 0 untried actions after first UCTBestChild for 3x3 tic tac toe game but is %v", len(node.untriedActions))
 	}
 
 	if !node.IsFullyExpanded() {
@@ -389,11 +389,3 @@ func TestNodeIsTerminal(t *testing.T) {
 		t.Errorf("Node should be terminal but is not")
 	}
 }
-
-
-
-
-
-
-
-
