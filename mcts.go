@@ -39,6 +39,7 @@ func rootMCTSNode(state GameState) monteCarloTreeSearchGameNode {
 	return newMCTSNode(nil, state, nil)
 }
 
+
 func (node *monteCarloTreeSearchGameNode) uctBestChild(c float64) *monteCarloTreeSearchGameNode {
 	chosenIndex := 0
 	maxValue := 0.0
@@ -67,6 +68,7 @@ func (node *monteCarloTreeSearchGameNode) backpropagate(result GameResult) {
 		node.n++
 		node = node.parent
 	}
+	node.n++
 }
 
 func (node *monteCarloTreeSearchGameNode) isTerminal() bool {
@@ -75,17 +77,17 @@ func (node *monteCarloTreeSearchGameNode) isTerminal() bool {
 }
 
 func (node *monteCarloTreeSearchGameNode) isFullyExpanded() bool {
-	return len(node.untriedActions) == 0 && !node.isTerminal()
+	return len(node.untriedActions) == 0
 }
 
-func (node *monteCarloTreeSearchGameNode) firstUntriedAction() Action {
+func (node *monteCarloTreeSearchGameNode) popFirstUntriedAction() Action {
 	action := node.untriedActions[0]
 	node.untriedActions = node.untriedActions[1:]
 	return action
 }
 
 func (node *monteCarloTreeSearchGameNode) expand() *monteCarloTreeSearchGameNode {
-	action := node.firstUntriedAction()
+	action := node.popFirstUntriedAction()
 	expandedChild := newMCTSNode(node, action.ApplyTo(node.value), action)
 	node.addChild(&expandedChild)
 	return &expandedChild

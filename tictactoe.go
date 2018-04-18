@@ -1,7 +1,5 @@
 package gomcts
 
-import "fmt"
-
 // TicTacToeBoardGameAction - action on a board game
 type TicTacToeBoardGameAction struct {
 	xCoord uint8
@@ -16,12 +14,8 @@ func (a TicTacToeBoardGameAction) ApplyTo(s GameState) GameState {
 		panic("*hands slapped*,  not your turn")
 	}
 
-	if ticTacToeGameState.emptySquares == 0 {
-		panic("*hands slapped*,  no empty squares on board")
-	}
 
 	if ticTacToeGameState.board[a.xCoord][a.yCoord] != 0 {
-		fmt.Println(a, s)
 		panic("*hands slapped*,  action illegal - square already occupied")
 	}
 
@@ -103,8 +97,8 @@ func (s TicTacToeGameState) EvaluateGame() (result GameResult, ended bool) {
 }
 
 func (s TicTacToeGameState) GetLegalActions() []Action {
+	actions := make([]Action, 0, s.emptySquares)
 	if !s.IsGameEnded() {
-		actions := make([]Action, 0, s.emptySquares)
 		for i := range s.board {
 			for j := range s.board[i] {
 				if s.board[i][j] == 0 {
@@ -112,9 +106,8 @@ func (s TicTacToeGameState) GetLegalActions() []Action {
 				}
 			}
 		}
-		return actions
 	}
-	return nil
+	return actions
 }
 
 func (s TicTacToeGameState) NextToMove() int8 {

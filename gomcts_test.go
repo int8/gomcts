@@ -2,6 +2,7 @@ package gomcts
 
 import (
 	"testing"
+	"fmt"
 )
 
 func TestTicTacToeGameStateInitialization(t *testing.T) {
@@ -368,5 +369,6 @@ func TestNodeIsTerminal(t *testing.T) {
 
 
 func TestMCTSTerminaes(t *testing.T) {
-	MonteCarloTreeSearch(CreateTicTacToeInitialGameState(3), DefaultRolloutPolicy, 1000)
+	action := MonteCarloTreeSearch(CreateTicTacToeInitialGameState(3), DefaultRolloutPolicy, 100)
+	fmt.Println(action)
 }
