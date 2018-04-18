@@ -2,7 +2,6 @@ package gomcts
 
 import "fmt"
 
-
 // TicTacToeBoardGameAction - action on a board game
 type TicTacToeBoardGameAction struct {
 	xCoord uint8
@@ -41,7 +40,7 @@ type TicTacToeGameState struct {
 	result       GameResult
 }
 
-func createTicTacToeInitialGameState(boardSize uint8) TicTacToeGameState {
+func CreateTicTacToeInitialGameState(boardSize uint8) TicTacToeGameState {
 	board := initialize2DInt8Slice(boardSize)
 	state := TicTacToeGameState{nextToMove: 1, board: board, emptySquares: uint16(boardSize) * uint16(boardSize)}
 	return state
@@ -116,4 +115,8 @@ func (s TicTacToeGameState) GetLegalActions() []Action {
 		return actions
 	}
 	return nil
+}
+
+func (s TicTacToeGameState) NextToMove() int8 {
+	return s.nextToMove
 }

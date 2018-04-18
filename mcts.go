@@ -1,98 +1,103 @@
 package gomcts
 
 import (
-	"fmt"
 	"math"
 )
 
 // MonteCarloTreeSearchGameNode - MCTS tree node struct
-type MonteCarloTreeSearchGameNode struct {
-	parent         *MonteCarloTreeSearchGameNode
+type monteCarloTreeSearchGameNode struct {
+	parent         *monteCarloTreeSearchGameNode
+	children       []*monteCarloTreeSearchGameNode
 	value          GameState
-	children       []MonteCarloTreeSearchGameNode
 	untriedActions []Action
+	causingAction Action
 	q              float64
-	n              int64
+	n              float64
 }
 
+func MonteCarloTreeSearch(state GameState, rolloutPolicy RolloutPolicy, simulations int) Action {
+	root := newMCTSNode(nil, state, nil)
+	var leaf *monteCarloTreeSearchGameNode
+	for i := 0; i < simulations; i++ {
+		leaf = root.treePolicy()
+		result := leaf.rollout(rolloutPolicy)
+		leaf.backpropagate(result)
+	}
+	return root.uctBestChild(0.0).causingAction
+}
+
+
 // NewMCTSNode - function initializing new MonteCarloTreeSearchGameNode
-func NewMCTSNode(parentNode *MonteCarloTreeSearchGameNode, state GameState) MonteCarloTreeSearchGameNode {
-	node := MonteCarloTreeSearchGameNode{parent: parentNode, value: state}
-	node.children = make([]MonteCarloTreeSearchGameNode, 0, 0)
+func newMCTSNode(parentNode *monteCarloTreeSearchGameNode, state GameState, causingAction Action) monteCarloTreeSearchGameNode {
+	node := monteCarloTreeSearchGameNode{parent: parentNode, value: state, causingAction: causingAction}
+	node.children = make([]*monteCarloTreeSearchGameNode, 0, 0)
 	node.untriedActions = state.GetLegalActions()
 	return node
 }
 
-func (node *MonteCarloTreeSearchGameNode) UCTBestChild(c float64) (child *MonteCarloTreeSearchGameNode, isLeaf bool) {
-	if node.IsTerminal() {
-		return nil, true
-	}
-
-	if node.IsFullyExpanded() {
-		chosenIndex := 0
-		maxValue := 0.0
-		for i, child := range node.children {
-			if (child.q/float64(child.n))+c*math.Sqrt(2*math.Log(float64(node.n))/float64(child.n)) > maxValue {
-				chosenIndex = i
-			}
-		}
-		return &node.children[chosenIndex], false
-	}
-	action := node.untriedActions[0]
-	node.untriedActions = node.untriedActions[1:]
-	childNode := NewMCTSNode(node, action.ApplyTo(node.value))
-	node.addChild(&childNode)
-	return &childNode, true
+func rootMCTSNode(state GameState) monteCarloTreeSearchGameNode {
+	return newMCTSNode(nil, state, nil)
 }
 
-func (node *MonteCarloTreeSearchGameNode) Rollout(policy RolloutPolicy) GameResult {
+func (node *monteCarloTreeSearchGameNode) uctBestChild(c float64) *monteCarloTreeSearchGameNode {
+	chosenIndex := 0
+	maxValue := 0.0
+	for i, child := range node.children {
+		if (child.q/child.n)+c*math.Sqrt(2*math.Log(node.n)/child.n) > maxValue {
+			maxValue = (child.q/child.n)+c*math.Sqrt(2*math.Log(node.n)/child.n)
+			chosenIndex = i
+		}
+	}
+	return node.children[chosenIndex]
+}
+
+
+func (node *monteCarloTreeSearchGameNode) rollout(policy RolloutPolicy) GameResult {
 	currentState := node.value
-	for {
-		result, ended := currentState.EvaluateGame()
-		if ended {
-			return result
-		} else {
-			currentState = policy(currentState).ApplyTo(currentState)
-		}
+	for !currentState.IsGameEnded() {
+		currentState = policy(currentState).ApplyTo(currentState)
+	}
+	gameResult, _ := currentState.EvaluateGame()
+	return gameResult
+}
+
+func (node *monteCarloTreeSearchGameNode) backpropagate(result GameResult) {
+	for !node.isRoot() {
+		node.q += float64(result) * float64(node.parent.value.NextToMove())
+		node.n++
+		node = node.parent
 	}
 }
 
-func (node *MonteCarloTreeSearchGameNode) Backpropagate(result GameResult) {
-	node.q += float64(result)
-	node.n++
-	if node.parent != nil {
-		node.parent.Backpropagate(result)
-	}
-}
-
-func (node *MonteCarloTreeSearchGameNode) IsTerminal() bool {
+func (node *monteCarloTreeSearchGameNode) isTerminal() bool {
 	_, ended := node.value.EvaluateGame()
 	return ended
 }
 
-func (node *MonteCarloTreeSearchGameNode) IsFullyExpanded() bool {
-	return len(node.untriedActions) == 0 && !node.IsTerminal()
+func (node *monteCarloTreeSearchGameNode) isFullyExpanded() bool {
+	return len(node.untriedActions) == 0 && !node.isTerminal()
 }
 
-func BestNextGameState(node *MonteCarloTreeSearchGameNode, n int) GameState {
-	for i := 0; i < n; i++ {
-		v := TreePolicy(node)
-		reward := v.Rollout(DefaultRolloutPolicy)
-		v.Backpropagate(reward)
-	}
-	best, _ := node.UCTBestChild(0.0)
-	return best.value
+func (node *monteCarloTreeSearchGameNode) firstUntriedAction() Action {
+	action := node.untriedActions[0]
+	node.untriedActions = node.untriedActions[1:]
+	return action
 }
 
-func TreePolicy(node *MonteCarloTreeSearchGameNode) *MonteCarloTreeSearchGameNode {
-	for {
-		if node.IsTerminal() {
-			return node
-		}
-		node, leaf := node.UCTBestChild(1.4)
-		fmt.Println(node)
-		if leaf {
-			return node
-		}
-	}
+func (node *monteCarloTreeSearchGameNode) expand() *monteCarloTreeSearchGameNode {
+	action := node.firstUntriedAction()
+	expandedChild := newMCTSNode(node, action.ApplyTo(node.value), action)
+	node.addChild(&expandedChild)
+	return &expandedChild
 }
+
+func (node *monteCarloTreeSearchGameNode) treePolicy() *monteCarloTreeSearchGameNode {
+	for !node.isTerminal() {
+		if !node.isFullyExpanded() {
+			return node.expand()
+		}
+		node = node.uctBestChild(1.4)
+	}
+	return node
+}
+

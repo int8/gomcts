@@ -12,4 +12,5 @@ type GameState interface {
 	EvaluateGame() (GameResult, bool)
 	GetLegalActions() []Action
 	IsGameEnded() bool
+	NextToMove() int8
 }

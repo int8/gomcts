@@ -1,6 +1,5 @@
 package gomcts
 
-
 func initialize2DInt8Slice(n uint8) [][]int8 {
 	board := make([][]int8, n)
 	for i := range board {

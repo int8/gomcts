@@ -1,9 +1,11 @@
 package gomcts
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestTicTacToeGameStateInitialization(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	if state.emptySquares != 9 {
 		t.Errorf("state.emptySquares should be 9, but it is %v", state.emptySquares)
 	}
@@ -23,7 +25,7 @@ func TestTicTacToeGameStateInitialization(t *testing.T) {
 
 
 func TestMoveProducesTicTacToeGameStateCorrectly(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	action := TicTacToeBoardGameAction{xCoord:1, yCoord:1, value:1}
 	nextState := action.ApplyTo(state).(TicTacToeGameState)
 
@@ -50,7 +52,7 @@ func TestMoveProducesTicTacToeGameStateCorrectly(t *testing.T) {
 }
 
 func TestEmptyTicTacToeGameStateEvaluation(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	_, gameEnded := state.EvaluateGame()
 	if gameEnded {
 		t.Errorf("Game state is evaluated as ended but should not")
@@ -59,7 +61,7 @@ func TestEmptyTicTacToeGameStateEvaluation(t *testing.T) {
 
 
 func TestNumberOfLegalActionsOfTicTacToeGameState(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	actions := state.GetLegalActions()
 	if len(actions) != 9 {
 		t.Errorf("There should be 9 actions to perform but is %v", len(actions))
@@ -73,7 +75,7 @@ func TestNumberOfLegalActionsOfTicTacToeGameState(t *testing.T) {
 }
 
 func TestLegalGameStateZeroIfGameEnded(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 4
 	state.board = [][]int8 {
 		{ 1, 0, 0},
@@ -95,7 +97,7 @@ func TestOutOfBoardMovePanic(t *testing.T) {
 		}
 	}()
 
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	action := TicTacToeBoardGameAction{xCoord: 4, yCoord: 4, value: 100}
 	action.ApplyTo(state)
 }
@@ -109,7 +111,7 @@ func TestAlreadyOccupiedSquareMovePanic(t *testing.T) {
 		}
 	}()
 
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	action := TicTacToeBoardGameAction{xCoord: 1, yCoord: 1, value: 1}
 	nextState := action.ApplyTo(state)
 	action.ApplyTo(nextState)
@@ -117,7 +119,7 @@ func TestAlreadyOccupiedSquareMovePanic(t *testing.T) {
 
 
 func TestGameEvaluationShouldBeNotEnded(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 1
 	state.board = [][]int8 {
 		{ 1,  0, -1},
@@ -138,7 +140,7 @@ func TestGameEvaluationShouldBeNotEnded(t *testing.T) {
 }
 
 func TestGameEvaluationShouldBeDraw(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 0
 	state.board = [][]int8 {
 		{ 1,  1, -1},
@@ -163,7 +165,7 @@ func TestGameEvaluationShouldBeDraw(t *testing.T) {
 
 
 func TestGameEvaluationShouldResultFirstPlayerWinningBecauseOfFirstDiagonal(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 4
 	state.board = [][]int8 {
 		{ 1, 0, 0},
@@ -183,7 +185,7 @@ func TestGameEvaluationShouldResultFirstPlayerWinningBecauseOfFirstDiagonal(t *t
 
 
 func TestGameEvaluationShouldResultFirstPlayerWinningBecauseOfSecondDiagonal(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 4
 	state.board = [][]int8 {
 		{ 0, 0, 1},
@@ -202,7 +204,7 @@ func TestGameEvaluationShouldResultFirstPlayerWinningBecauseOfSecondDiagonal(t *
 }
 
 func TestGameEvaluationShouldResultSecondPlayerWinningBecauseOfFirstDiagonal(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 3
 	state.board = [][]int8 {
 		{ -1, 0, 1},
@@ -221,7 +223,7 @@ func TestGameEvaluationShouldResultSecondPlayerWinningBecauseOfFirstDiagonal(t *
 }
 
 func TestGameEvaluationShouldResultSecondPlayerWinningBecauseOfSecondDiagonal(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 3
 	state.board = [][]int8 {
 		{ 1, 0, -1},
@@ -241,7 +243,7 @@ func TestGameEvaluationShouldResultSecondPlayerWinningBecauseOfSecondDiagonal(t 
 
 
 func TestGameEvaluationShouldResultFirstPlayerWinningBecauseOfFirstRow(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 4
 	state.board = [][]int8 {
 		{ 1, 1, 1},
@@ -260,7 +262,7 @@ func TestGameEvaluationShouldResultFirstPlayerWinningBecauseOfFirstRow(t *testin
 }
 
 func TestGameEvaluationShouldResultSecondPlayerWinningBecauseOfFirstRow(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 3
 	state.board = [][]int8 {
 		{ -1, -1, -1},
@@ -281,7 +283,7 @@ func TestGameEvaluationShouldResultSecondPlayerWinningBecauseOfFirstRow(t *testi
 
 
 func TestGameEvaluationShouldResultFirstPlayerWinningBecauseOfFirstColumn(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 4
 	state.board = [][]int8 {
 		{ 1, 0, 0},
@@ -300,7 +302,7 @@ func TestGameEvaluationShouldResultFirstPlayerWinningBecauseOfFirstColumn(t *tes
 }
 
 func TestGameEvaluationShouldResultSecondPlayerWinningBecauseOfFirstColumn(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 3
 	state.board = [][]int8 {
 		{ -1, 1, 1},
@@ -319,7 +321,7 @@ func TestGameEvaluationShouldResultSecondPlayerWinningBecauseOfFirstColumn(t *te
 }
 
 
-func TestRolloutTerminates(t *testing.T) {
+func TestDefaultRolloutPolicyTerminates(t *testing.T) {
 	defer func() {
 		r := recover();
 		if r != nil {
@@ -327,56 +329,30 @@ func TestRolloutTerminates(t *testing.T) {
 		}
 	}()
 
-	state := createTicTacToeInitialGameState(3)
-	node := NewMCTSNode(nil, state)
-	node.Rollout(DefaultRolloutPolicy)
+	state := CreateTicTacToeInitialGameState(3)
+	node := rootMCTSNode(state)
+	node.rollout(DefaultRolloutPolicy)
 }
 
 
 func TestUCTBestChildNewNode(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
-	node := NewMCTSNode(nil, state)
+	defer func() {
+		r := recover();
+		if r == nil {
+			t.Errorf("The code should panic - no children but best child is being computed")
+		}
+	}()
+
+	state := CreateTicTacToeInitialGameState(3)
+	node := rootMCTSNode(state)
 	if len(node.untriedActions) != 9 {
 		t.Errorf("There should be 9 untried actions at the beginning of 3x3 tic tac toe game")
 	}
-	node.UCTBestChild(1.4)
-
-	if len(node.untriedActions) != 8 {
-		t.Errorf("There should be 8 untried actions after first UCTBestChild for 3x3 tic tac toe game but is %v", len(node.untriedActions))
-	}
+	node.uctBestChild(1.4)
 }
-
-
-func TestUCTBestChildNewNode9Times(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
-	node := NewMCTSNode(nil, state)
-	if len(node.untriedActions) != 9 {
-		t.Errorf("There should be 9 untried actions at the beginning of 3x3 tic tac toe game")
-	}
-	node.UCTBestChild(1.4)
-	node.UCTBestChild(1.4)
-	node.UCTBestChild(1.4)
-	node.UCTBestChild(1.4)
-	node.UCTBestChild(1.4)
-	node.UCTBestChild(1.4)
-	node.UCTBestChild(1.4)
-	node.UCTBestChild(1.4)
-	node.UCTBestChild(1.4)
-
-	if len(node.untriedActions) != 0 {
-		t.Errorf("There should be 0 untried actions after first UCTBestChild for 3x3 tic tac toe game but is %v", len(node.untriedActions))
-	}
-
-	if !node.IsFullyExpanded() {
-		t.Errorf("Node should be fully expanded now but is not")
-	}
-
-	node.UCTBestChild(1.4)
-}
-
 
 func TestNodeIsTerminal(t *testing.T) {
-	state := createTicTacToeInitialGameState(3)
+	state := CreateTicTacToeInitialGameState(3)
 	state.emptySquares = 3
 	state.board = [][]int8 {
 		{ -1, 1, 1},
@@ -384,8 +360,13 @@ func TestNodeIsTerminal(t *testing.T) {
 		{ -1,1, 0},
 	}
 
-	node := NewMCTSNode(nil, state)
-	if !node.IsTerminal() {
+	node := rootMCTSNode(state)
+	if !node.isTerminal() {
 		t.Errorf("Node should be terminal but is not")
 	}
+}
+
+
+func TestMCTSTerminaes(t *testing.T) {
+	MonteCarloTreeSearch(CreateTicTacToeInitialGameState(3), DefaultRolloutPolicy, 1000)
 }
