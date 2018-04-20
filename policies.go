@@ -1,12 +1,16 @@
 package gomcts
 
-import "math/rand"
+import (
+	"crypto/rand"
+	"math/big"
+)
 
 // RolloutPolicy - function signature determining the next action during Monte Carlo Tree Search rollout
 type RolloutPolicy func(GameState) Action
 
 func DefaultRolloutPolicy(state GameState) Action {
 	actions := state.GetLegalActions()
-	actionIndex := rand.Intn(len(actions))
-	return actions[actionIndex]
+	var numberOfActions int64 = int64(len(actions))
+	actionIndex, _ := rand.Int(rand.Reader, big.NewInt(numberOfActions))
+	return actions[actionIndex.Int64()]
 }

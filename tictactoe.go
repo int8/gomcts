@@ -14,7 +14,6 @@ func (a TicTacToeBoardGameAction) ApplyTo(s GameState) GameState {
 		panic("*hands slapped*,  not your turn")
 	}
 
-
 	if ticTacToeGameState.board[a.xCoord][a.yCoord] != 0 {
 		panic("*hands slapped*,  action illegal - square already occupied")
 	}
@@ -24,7 +23,6 @@ func (a TicTacToeBoardGameAction) ApplyTo(s GameState) GameState {
 	ticTacToeGameState.emptySquares--
 	return ticTacToeGameState
 }
-
 
 type TicTacToeGameState struct {
 	nextToMove   int8
@@ -39,7 +37,6 @@ func CreateTicTacToeInitialGameState(boardSize uint8) TicTacToeGameState {
 	state := TicTacToeGameState{nextToMove: 1, board: board, emptySquares: uint16(boardSize) * uint16(boardSize)}
 	return state
 }
-
 
 func (s TicTacToeGameState) IsGameEnded() bool {
 	_, ended := s.EvaluateGame()
@@ -69,22 +66,22 @@ func (s TicTacToeGameState) EvaluateGame() (result GameResult, ended bool) {
 			colSums[j] += int16(s.board[i][j])
 		}
 		diag1Sum += int16(s.board[i][i])
-		diag2Sum += int16(s.board[boardSize - 1 - i][i])
+		diag2Sum += int16(s.board[boardSize-1-i][i])
 	}
 
-	if diag1Sum == int16(boardSize) || diag2Sum == int16(boardSize)  {
+	if diag1Sum == int16(boardSize) || diag2Sum == int16(boardSize) {
 		return GameResult(1), true
 	}
 
-	if diag1Sum == -int16(boardSize) || diag2Sum == -int16(boardSize)  {
+	if diag1Sum == -int16(boardSize) || diag2Sum == -int16(boardSize) {
 		return GameResult(-1), true
 	}
 
 	for i := range s.board {
-		if rowSums[i] == int16(boardSize) || colSums[i] == int16(boardSize)  {
+		if rowSums[i] == int16(boardSize) || colSums[i] == int16(boardSize) {
 			return GameResult(1), true
 		}
-		if rowSums[i] == -int16(boardSize) || colSums[i] == -int16(boardSize)  {
+		if rowSums[i] == -int16(boardSize) || colSums[i] == -int16(boardSize) {
 			return GameResult(-1), true
 		}
 	}
