@@ -1,12 +1,13 @@
 package gomcts
 
-// TicTacToeBoardGameAction - action on a board game
+// TicTacToeBoardGameAction - action on a tic tac toe board game
 type TicTacToeBoardGameAction struct {
 	xCoord uint8
 	yCoord uint8
 	value  int8
 }
 
+// ApplyTo - TicTacToeBoardGameAction implementation of ApplyTo method of Action interface
 func (a TicTacToeBoardGameAction) ApplyTo(s GameState) GameState {
 	ticTacToeGameState := s.(TicTacToeGameState)
 	ticTacToeGameState.board = copy2DInt8Slice(ticTacToeGameState.board)
@@ -24,6 +25,7 @@ func (a TicTacToeBoardGameAction) ApplyTo(s GameState) GameState {
 	return ticTacToeGameState
 }
 
+// TicTacToeGameState - tic tac toe game state
 type TicTacToeGameState struct {
 	nextToMove   int8
 	board        [][]int8
@@ -32,17 +34,20 @@ type TicTacToeGameState struct {
 	result       GameResult
 }
 
+// CreateTicTacToeInitialGameState - initializes tic tac toe game state
 func CreateTicTacToeInitialGameState(boardSize uint8) TicTacToeGameState {
 	board := initialize2DInt8Slice(boardSize)
 	state := TicTacToeGameState{nextToMove: 1, board: board, emptySquares: uint16(boardSize) * uint16(boardSize)}
 	return state
 }
 
+// IsGameEnded - TicTacToeGameState implementation of IsGameEnded method of GameState interface
 func (s TicTacToeGameState) IsGameEnded() bool {
 	_, ended := s.EvaluateGame()
 	return ended
 }
 
+// EvaluateGame - TicTacToeGameState implementation of EvaluateGame method of GameState interface
 func (s TicTacToeGameState) EvaluateGame() (result GameResult, ended bool) {
 
 	defer func() {
@@ -93,6 +98,7 @@ func (s TicTacToeGameState) EvaluateGame() (result GameResult, ended bool) {
 	return GameResult(0), false
 }
 
+// GetLegalActions - TicTacToeGameState implementation of GetLegalActions method of GameState interface
 func (s TicTacToeGameState) GetLegalActions() []Action {
 	actions := make([]Action, 0, s.emptySquares)
 	if !s.IsGameEnded() {
@@ -107,6 +113,7 @@ func (s TicTacToeGameState) GetLegalActions() []Action {
 	return actions
 }
 
+// NextToMove - TicTacToeGameState implementation of NextToMove method of GameState interface
 func (s TicTacToeGameState) NextToMove() int8 {
 	return s.nextToMove
 }

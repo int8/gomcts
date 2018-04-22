@@ -4,7 +4,6 @@ import (
 	"math"
 )
 
-// MonteCarloTreeSearchGameNode - MCTS tree node struct
 type monteCarloTreeSearchGameNode struct {
 	parent         *monteCarloTreeSearchGameNode
 	children       []*monteCarloTreeSearchGameNode
@@ -15,6 +14,7 @@ type monteCarloTreeSearchGameNode struct {
 	n              float64
 }
 
+// MonteCarloTreeSearch - function starting Monte Carlo Tree Search over provided GameState using RolloutPolicy of your choice, repeating simulation requested amount of time
 func MonteCarloTreeSearch(state GameState, rolloutPolicy RolloutPolicy, simulations int) Action {
 	root := newMCTSNode(nil, state, nil)
 	var leaf *monteCarloTreeSearchGameNode
@@ -26,7 +26,6 @@ func MonteCarloTreeSearch(state GameState, rolloutPolicy RolloutPolicy, simulati
 	return root.uctBestChild(0.0).causingAction
 }
 
-// NewMCTSNode - function initializing new MonteCarloTreeSearchGameNode
 func newMCTSNode(parentNode *monteCarloTreeSearchGameNode, state GameState, causingAction Action) monteCarloTreeSearchGameNode {
 	node := monteCarloTreeSearchGameNode{parent: parentNode, value: state, causingAction: causingAction}
 	node.children = make([]*monteCarloTreeSearchGameNode, 0, 0)
