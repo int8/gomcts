@@ -1,3 +1,7 @@
+
+[![GoDoc Reference](https://godoc.org/github.com/int8/gomcts/vm?status.svg)](http://godoc.org/github.com/int8/gomcts)
+[![Go Report Card](https://goreportcard.com/badge/github.com/int8/gomcts)](https://goreportcard.com/report/github.com/int8/gomcts)
+
 ## Monte Carlo Tree Search
 
 Implementation of basic [Monte Carlo Tree Search algorithm](https://int8.io/monte-carlo-tree-search-beginners-guide/). 
