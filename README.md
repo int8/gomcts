@@ -54,7 +54,7 @@ func YourCustomRolloutPolicy(state GameState) Action {
 #### Examples 
 
 ##### Tic-Tac-Toe 
-There is a built-in tic-tac-toe game implementation available through 
+There is a built-in tic-tac-toe game implementation [available](https://github.com/int8/gomcts/blob/master/tictactoe.go) through 
  ```TicTacToeBoardGameAction``` and ```TicTacToeGameState``` types
 
 To play with it go for something like:
