@@ -10,7 +10,7 @@ go get github.com/int8/gomcts
 
 
 #### Usage 
-To use it for your sum-zero strictly competitive two players game you need to provide implementation of ```GameState``` and ```Action``` interfaces
+To use it for your perfect-information sum-zero strictly competitive two players game (board games such as go/chess/checkers/tictactoe) you need to provide implementation of ```GameState``` and ```Action``` interfaces
 
 ```go
 // Action - game action interface
