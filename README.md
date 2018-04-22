@@ -2,7 +2,7 @@
 
 Implementation of basic [Monte Carlo Tree Search algorithm](https://int8.io/monte-carlo-tree-search-beginners-guide/). 
 
-####Installation 
+#### Installation 
 Install with 
 ```bash
 go get github.com/int8/gomcts
