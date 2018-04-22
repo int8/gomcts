@@ -3,7 +3,7 @@ package gomcts
 // GameResult - number representing a game result
 type GameResult float64
 
-type Action interface{
+type Action interface {
 	ApplyTo(GameState) GameState
 }
 
