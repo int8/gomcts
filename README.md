@@ -24,6 +24,13 @@ type GameState interface {
 }
 ```
 
+where ```GameResult``` is just an int8 alias 
+```go
+type GameResult int8
+```
+
+As current implementation expects sum-zero two players game GameResult is supposed to reflect it. For the same reason ```NextToMove()``` is expected to return ```1``` or ```-1```.    
+
 You can use ```DefaultRolloutPolicy``` (actions chosen randomly) or implement your own Rollout Policy as a function with the following signature:
 
 ```go
