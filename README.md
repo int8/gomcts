@@ -7,7 +7,7 @@ Install with
 go get github.com/int8/gomcts
 ```
 
-To use it for your sum-zero two players game you need to provide implementation of ```GameState``` and ```Actions``` interfaces
+To use it for your sum-zero two players game you need to provide implementation of ```GameState``` and ```Action``` interfaces
 
 ```go
 // Action - game action interface
