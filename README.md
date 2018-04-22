@@ -15,6 +15,9 @@ go get github.com/int8/gomcts
 
 
 #### Usage 
+
+The central routine is ```MonteCarloTreeSearch(GameState, RolloutPolicy, int)``` which consumes GameState, RolloutPolicy and performs requested number of MCTS simulations 
+
 To use it for your perfect-information sum-zero strictly competitive two players game (board games such as go/chess/checkers/tictactoe) you need to provide implementation of ```GameState``` and ```Action``` interfaces
 
 ```go
