@@ -2,12 +2,15 @@
 
 Implementation of basic [Monte Carlo Tree Search algorithm](https://int8.io/monte-carlo-tree-search-beginners-guide/). 
 
+####Installation 
 Install with 
 ```bash
 go get github.com/int8/gomcts
 ```
 
-To use it for your sum-zero two players game you need to provide implementation of ```GameState``` and ```Action``` interfaces
+
+#### Usage 
+To use it for your sum-zero strictly competitive two players game you need to provide implementation of ```GameState``` and ```Action``` interfaces
 
 ```go
 // Action - game action interface
@@ -24,9 +27,9 @@ type GameState interface {
 }
 ```
 
-where ```GameResult``` is just an int8 alias 
+where ```GameResult``` is just ```float64``` alias 
 ```go
-type GameResult int8
+type GameResult float64
 ```
 
 As current implementation expects sum-zero two players game GameResult is supposed to reflect it. For the same reason ```NextToMove()``` is expected to return ```1``` or ```-1```.    
@@ -40,6 +43,9 @@ func YourCustomRolloutPolicy(state GameState) Action {
 ```
 
 
+#### Examples 
+
+##### Tic-Tac-Toe 
 There is a built-in tic-tac-toe game implementation available through 
  ```TicTacToeBoardGameAction``` and ```TicTacToeGameState``` types
 
